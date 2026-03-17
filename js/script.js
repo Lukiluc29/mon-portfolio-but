@@ -1,7 +1,27 @@
 // Attendre que le DOM soit chargé
 document.addEventListener('DOMContentLoaded', function() {
+    // Détection du mode sombre
+    function detectDarkMode() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
+        // Écouter les changements de préférence
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (e.matches) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        });
+    }
+
+    // Appliquer la détection
+    detectDarkMode();
+
     // Éléments principaux
     const card1 = document.getElementById('card-1');
+    const card2 = document.getElementById('card-2');
+    const card3 = document.getElementById('card-3');
     const contentArea = document.getElementById('content-area');
 
     // Données pour la première année
@@ -35,50 +55,34 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     `;
 
-    // Message par défaut
-    const defaultMessage = `<div class="default-message"><p>👈 Cliquez sur "1ʳᵉ Année" pour afficher les détails</p></div>`;
+    // Messages pour les autres années
+    const secondYearContent = `<div class="default-message"><p>🔄 Contenu de la 2ᵉ année en cours de préparation…</p></div>`;
+    const thirdYearContent = `<div class="default-message"><p>🚧 La 3ᵉ année sera disponible prochainement !</p></div>`;
 
-    // Fonction pour afficher le contenu de la première année
-    function showFirstYearContent() {
-        contentArea.innerHTML = firstYearContent;
-        // Ajouter une classe pour une transition en douceur (optionnel)
-        contentArea.classList.add('content-loaded');
-        
+    // Fonction pour afficher le contenu et mettre à jour la sélection
+    function showContent(content, selectedCard) {
+        contentArea.innerHTML = content;
         // Mettre à jour l'état visuel des cartes
-        card1.classList.add('selected');
-        card2.classList.remove('selected');
-        card3.classList.remove('selected');
+        [card1, card2, card3].forEach(card => card.classList.remove('selected'));
+        selectedCard.classList.add('selected');
     }
 
     // Gestionnaire de clic pour la carte 1
     card1.addEventListener('click', function() {
-        showFirstYearContent();
+        showContent(firstYearContent, card1);
     });
 
-    // Gestionnaires pour les cartes inactives (2ème et 3ème année)
-    const card2 = document.getElementById('card-2');
-    const card3 = document.getElementById('card-3');
-
+    // Gestionnaires pour les cartes 2 et 3
     card2.addEventListener('click', function(event) {
-        // Empêcher toute action si la carte est inactive
         event.preventDefault();
-        // Optionnel : afficher un message temporaire
-        const originalContent = contentArea.innerHTML;
-        contentArea.innerHTML = `<div class="default-message"><p>🔄 Contenu de la 2ᵉ année en cours de préparation…</p></div>`;
-        setTimeout(() => {
-            contentArea.innerHTML = originalContent;
-        }, 1500);
+        showContent(secondYearContent, card2);
     });
 
     card3.addEventListener('click', function(event) {
         event.preventDefault();
-        const originalContent = contentArea.innerHTML;
-        contentArea.innerHTML = `<div class="default-message"><p>🚧 La 3ᵉ année sera disponible prochainement !</p></div>`;
-        setTimeout(() => {
-            contentArea.innerHTML = originalContent;
-        }, 1500);
+        showContent(thirdYearContent, card3);
     });
 
-    // Initialisation : afficher un message d'accueil
-    contentArea.innerHTML = defaultMessage;
+    // Initialisation : ne rien afficher dans la zone de contenu
+    contentArea.innerHTML = '';
 });
